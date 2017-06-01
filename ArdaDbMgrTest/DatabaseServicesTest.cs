@@ -34,7 +34,7 @@ namespace ArdaDbMgrTest
         }
 
         [Fact]
-        public void CreateAndDeleteSchemaHistory()
+        public void CreateSchemaHistory()
         {
             // setup
             var dbsvcsInit = new DatabaseServices("Integrated Security=SSPI");

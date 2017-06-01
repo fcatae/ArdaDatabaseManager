@@ -62,7 +62,7 @@ namespace ArdaDbMgr.Services
                 $"CREATE TABLE {_SchemaHistory_} (" +
                 "  Seq INT PRIMARY KEY IDENTITY(1,1)," +
                 "  Name NVARCHAR(256) NOT NULL," +
-                "  Hash INT NULL" +
+                "  Hash INT NOT NULL" +
                 ")");
 
             Execute(createTable);
@@ -91,6 +91,21 @@ namespace ArdaDbMgr.Services
             return (result != null);
         }
 
+        public void AddSchemaModification(string title, int hash)
+        {
+            const string _SchemaHistory_ = TABLE_SCHEMA_HISTORY;
+
+            if (title == null)
+                throw new ArgumentNullException(nameof(title));
+
+            var insertSchemaHistory = DatabaseCommand.Text
+                ($"INSERT {_SchemaHistory_}(Name, Hash) VALUES (@title, @hash)")
+                .Parameter("@title", title)
+                .Parameter("@hash", hash);
+
+            Execute(insertSchemaHistory);
+        }
+        
         void Validate(string name)
         {
             if (name == null)
