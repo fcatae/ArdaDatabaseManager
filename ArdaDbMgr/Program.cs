@@ -19,6 +19,9 @@ namespace ArdaDbMgr
 
             // Enumerate files
             // Connect to database
+            // Check database is created
+            // Create database if needed
+            // Check schema history table
         }
     }
 }

@@ -37,7 +37,9 @@ namespace ArdaDbMgr.Services
         {
             Validate(databaseName);
 
-            var listDatabaseWithName = new DatabaseCommand($"SELECT * FROM sys.databases WHERE name='{databaseName}'");
+            var listDatabaseWithName = DatabaseCommand
+                .Text($"SELECT name FROM sys.databases WHERE name=@dbname")
+                .Parameter("@dbname", databaseName);
 
             var databaseFound = Execute(listDatabaseWithName, r => r["name"] );
 
@@ -128,6 +130,18 @@ namespace ArdaDbMgr.Services
             public DatabaseCommand(string commandText)
             {
                 _command = new SqlCommand(commandText);
+            }
+
+            public static DatabaseCommand Text(string commandText)
+            {
+                return new DatabaseCommand(commandText);
+            }
+
+            public DatabaseCommand Parameter(string parameterName, object value)
+            {
+                _command.Parameters.AddWithValue(parameterName, value);
+
+                return this;
             }
 
             public SqlCommand GetSqlCommand()
