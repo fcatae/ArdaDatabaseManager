@@ -13,6 +13,11 @@ namespace ArdaDbMgrTest
         {
             var dbsvcs = new DatabaseServices("Integrated Security=SSPI");
 
+            // setup
+            if(dbsvcs.VerifyDatabase("DB001"))
+                dbsvcs.DropDatabase("DB001");
+
+            // test
             bool dbExistsBefore = dbsvcs.VerifyDatabase("DB001");
 
             dbsvcs.CreateDatabase("DB001");

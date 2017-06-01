@@ -21,31 +21,37 @@ namespace ArdaDbMgr.Services
 
         public void CreateDatabase(string databaseName)
         {
+            // may have SQL injection!
             Validate(databaseName);
 
-            // may have SQL injection!
-            Execute($"CREATE DATABASE {databaseName}");
+            var createDatabase = DatabaseCommand.Text
+                ($"CREATE DATABASE {databaseName}");
+
+            Execute(createDatabase);
         }
 
         public void DropDatabase(string databaseName)
         {
+            // may have SQL injection!
             Validate(databaseName);
 
-            // may have SQL injection!
-            Execute($"DROP DATABASE {databaseName}");
+            var dropDatabase = DatabaseCommand.Text
+                ($"DROP DATABASE {databaseName}");
+
+            Execute(dropDatabase);
         }
 
         public bool VerifyDatabase(string databaseName)
         {
             Validate(databaseName);
 
-            var listDatabaseWithName = DatabaseCommand
-                .Text($"SELECT name FROM sys.databases WHERE name=@dbname")
+            var listDatabaseWithName = DatabaseCommand.Text
+                ($"SELECT DB_ID(@dbname)")
                 .Parameter("@dbname", databaseName);
 
-            var databaseFound = Execute(listDatabaseWithName, r => r["name"] );
+            var dbid = Execute<short?>(listDatabaseWithName);
 
-            return (databaseFound.Count() > 0);
+            return (dbid > 0);
         }
 
         public void CreateSchemaHistory()
@@ -66,7 +72,8 @@ namespace ArdaDbMgr.Services
         {
             const string _SchemaHistory_ = TABLE_SCHEMA_HISTORY;
 
-            var dropTable = DatabaseCommand.Text($"DROP TABLE {_SchemaHistory_}");
+            var dropTable = DatabaseCommand.Text
+                ($"DROP TABLE {_SchemaHistory_}");
 
             Execute(dropTable);
         }
@@ -103,19 +110,7 @@ namespace ArdaDbMgr.Services
                 || objectName.Contains("\n"))
                     throw new InvalidOperationException("DatabaseServices: name contains space");
         }
-
-        void Execute(string commandText)
-        {
-            using (var connection = new SqlConnection(_connectionString))
-            {
-                SqlCommand cmd = new SqlCommand(commandText, connection);
-
-                connection.Open();
-
-                cmd.ExecuteNonQuery();
-            }
-        }
-
+        
         void Execute(DatabaseCommand command)
         {
             Execute<object>(command);
