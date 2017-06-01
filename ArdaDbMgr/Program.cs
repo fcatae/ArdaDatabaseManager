@@ -18,6 +18,7 @@ namespace ArdaDbMgr
             dbmgr.StartUpgrade();
 
             // Enumerate files
+            // Connect to database
         }
     }
 }
