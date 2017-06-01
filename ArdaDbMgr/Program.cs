@@ -1,4 +1,7 @@
 ﻿using System;
+using System.Diagnostics;
+using System.Linq;
+using ArdaDbMgr.Services;
 
 namespace ArdaDbMgr
 {
@@ -7,6 +10,14 @@ namespace ArdaDbMgr
         static void Main(string[] args)
         {
             Console.WriteLine("Hello World!");
+
+            var dbmgr = new DatabaseSchemaManager("sqlfiles");
+
+            dbmgr.Connect("connectionString");
+
+            dbmgr.StartUpgrade();
+
+            // Enumerate files
         }
     }
 }
