@@ -10,6 +10,8 @@ namespace ArdaDbMgr.Services
 {
     public class DatabaseServices
     {
+        const string TABLE_SCHEMA_HISTORY = "[_SchemaHistory_]";
+
         private readonly string _connectionString;
 
         public DatabaseServices(string connectionString)
@@ -46,6 +48,20 @@ namespace ArdaDbMgr.Services
             return (databaseFound.Count() > 0);
         }
 
+        public void CreateSchemaHistory()
+        {
+            const string _SchemaHistory_ = TABLE_SCHEMA_HISTORY;
+
+            var createTable = DatabaseCommand.Text(
+                $"CREATE TABLE {_SchemaHistory_} (" +
+                "  Seq INT PRIMARY KEY IDENTITY(1,1)," +
+                "  Name NVARCHAR(256) NOT NULL," +
+                "  Hash INT NULL" +
+                ")");
+
+            Execute(createTable);
+        }
+
         void Validate(string name)
         {
             if (name == null)
@@ -76,6 +92,11 @@ namespace ArdaDbMgr.Services
 
                 cmd.ExecuteNonQuery();
             }
+        }
+
+        void Execute(DatabaseCommand command)
+        {
+            Execute<object>(command);
         }
 
         T Execute<T>(DatabaseCommand command)
