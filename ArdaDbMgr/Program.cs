@@ -23,14 +23,6 @@ namespace ArdaDbMgr
             // Create database if needed
             // Check schema history table
             
-            var dbsvcsInit = new DatabaseServices("Integrated Security=SSPI");
-            if(!dbsvcsInit.VerifyDatabase("DB002SchemaHistory"))
-            {
-                dbsvcsInit.CreateDatabase("DB002SchemaHistory");
-            }
-
-            var dbsvcs = new DatabaseServices("Integrated Security=SSPI;Database=DB002SchemaHistory");
-            dbsvcs.CreateSchemaHistory();
         }
     }
 }

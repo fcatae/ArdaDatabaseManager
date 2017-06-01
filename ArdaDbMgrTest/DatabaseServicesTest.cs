@@ -27,5 +27,31 @@ namespace ArdaDbMgrTest
             Assert.True(dbExistsAfter);
             Assert.False(dbExistsAfterDelete);
         }
+
+        [Fact]
+        public void CreateAndDeleteSchemaHistory()
+        {
+            // setup
+            var dbsvcsInit = new DatabaseServices("Integrated Security=SSPI");
+            if (!dbsvcsInit.VerifyDatabase("DB002SchemaHistory"))
+            {
+                dbsvcsInit.CreateDatabase("DB002SchemaHistory");
+            }
+
+            // test
+            var dbsvcs = new DatabaseServices("Integrated Security=SSPI;Database=DB002SchemaHistory");
+
+            bool beforeSchemaHistory = dbsvcs.CheckSchemaHistoryExists();
+
+            dbsvcs.CreateSchemaHistory();
+            bool afterSchemaHistory = dbsvcs.CheckSchemaHistoryExists();
+
+            dbsvcs.DropSchemaHistory();
+            bool afterSchemaHistoryDelete = dbsvcs.CheckSchemaHistoryExists();
+
+            Assert.False(beforeSchemaHistory);
+            Assert.True(afterSchemaHistory);
+            Assert.False(afterSchemaHistoryDelete);
+        }
     }
 }

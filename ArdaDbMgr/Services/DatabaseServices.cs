@@ -62,6 +62,28 @@ namespace ArdaDbMgr.Services
             Execute(createTable);
         }
 
+        public void DropSchemaHistory()
+        {
+            const string _SchemaHistory_ = TABLE_SCHEMA_HISTORY;
+
+            var dropTable = DatabaseCommand.Text($"DROP TABLE {_SchemaHistory_}");
+
+            Execute(dropTable);
+        }
+
+        public bool CheckSchemaHistoryExists()
+        {
+            const string _SchemaHistory_ = TABLE_SCHEMA_HISTORY;
+
+            var createTable = DatabaseCommand.Text
+                ("SELECT OBJECT_ID(@schemaHistory)")
+                .Parameter("@schemaHistory", _SchemaHistory_);
+
+            var result = Execute<int?>(createTable);
+
+            return (result != null);
+        }
+
         void Validate(string name)
         {
             if (name == null)
@@ -111,7 +133,9 @@ namespace ArdaDbMgr.Services
 
                 cmd.Connection = connection;
 
-                result = (T)cmd.ExecuteScalar();
+                object obj = cmd.ExecuteScalar();
+
+                result = (obj is DBNull) ? default(T) : (T)obj;
             }
 
             return result;
