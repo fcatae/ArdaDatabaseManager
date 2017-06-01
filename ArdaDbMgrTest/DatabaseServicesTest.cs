@@ -43,14 +43,30 @@ namespace ArdaDbMgrTest
                 dbsvcsInit.CreateDatabase("DB002SchemaHistory");
             }
 
-            // test
             var dbsvcs = new DatabaseServices("Integrated Security=SSPI;Database=DB002SchemaHistory");
 
+            if (dbsvcs.CheckSchemaHistoryExists())
+                dbsvcs.DropSchemaHistory();
+
+            // test
             bool beforeSchemaHistory = dbsvcs.CheckSchemaHistoryExists();
 
             dbsvcs.CreateSchemaHistory();
             bool afterSchemaHistory = dbsvcs.CheckSchemaHistoryExists();
 
+            // add & get
+            dbsvcs.AddSchemaModification("Initial", 10);
+            dbsvcs.AddSchemaModification("Second", 20);
+            dbsvcs.AddSchemaModification("Third", 30);
+
+            var modifications = dbsvcs.GetSchemaHistory(5).ToArray();
+            Assert.Equal("Third", modifications[0].Name );
+            Assert.Equal(10, modifications[2].Hash );
+
+            var lastModification = dbsvcs.GetSchemaHistory().ToArray();
+            Assert.Equal(30, lastModification[0].Hash);
+
+            // drop
             dbsvcs.DropSchemaHistory();
             bool afterSchemaHistoryDelete = dbsvcs.CheckSchemaHistoryExists();
 

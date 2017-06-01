@@ -5,6 +5,7 @@ using System.Text;
 using System.Data;
 using System.Data.SqlClient;
 using System.Data.Common;
+using ArdaDbMgr.Services.Models;
 
 namespace ArdaDbMgr.Services
 {
@@ -104,6 +105,28 @@ namespace ArdaDbMgr.Services
                 .Parameter("@hash", hash);
 
             Execute(insertSchemaHistory);
+        }
+
+        public IEnumerable<SchemaModification> GetSchemaHistory(int rowcount = 1)
+        {
+            const string _SchemaHistory_ = TABLE_SCHEMA_HISTORY;
+
+            if (rowcount <= 0)
+                throw new ArgumentOutOfRangeException(nameof(rowcount));
+
+            var getSchemaHistory = DatabaseCommand.Text
+                ($"SELECT TOP(@max) Seq, Name, Hash FROM {_SchemaHistory_} ORDER BY Seq DESC")
+                .Parameter("@max", rowcount);
+
+            var results = Execute(getSchemaHistory, 
+                r => 
+                new SchemaModification {
+                    Seq = (int)r["Seq"],
+                    Name = (string)r["Name"],
+                    Hash = (int)r["Hash"]
+                });
+
+            return results;
         }
         
         void Validate(string name)

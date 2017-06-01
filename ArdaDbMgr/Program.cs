@@ -51,6 +51,10 @@ namespace ArdaDbMgr
             dbsvcs.AddSchemaModification("Second", 20);
             dbsvcs.AddSchemaModification("Third", 30);
 
+            var modifications = dbsvcs.GetSchemaHistory(5).ToArray();
+
+            var lastModification = dbsvcs.GetSchemaHistory().ToArray();
+
             dbsvcs.DropSchemaHistory();
             bool afterSchemaHistoryDelete = dbsvcs.CheckSchemaHistoryExists();
             
