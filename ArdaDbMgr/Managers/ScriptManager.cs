@@ -38,16 +38,26 @@ namespace ArdaDbMgr.Managers
                 Init();
             }
         }
-        
-        public IEnumerable<Migration> GetPendingChanges(int firstIndex = 1)
+
+        public string ReadText(Migration migration)
         {
-            if (firstIndex <= 0)
-                throw new ArgumentOutOfRangeException("firstIndex must be equal or greater than 1");
+            return _index[migration.Seq].Read();
+        }
+
+        public IEnumerable<Migration> GetPendingChanges(Migration migration)
+        {
+            return GetPendingChanges(migration.Seq);
+        }
+
+        public IEnumerable<Migration> GetPendingChanges(int lastIndex = 0)
+        {
+            if (lastIndex < 0)
+                throw new ArgumentOutOfRangeException("firstIndex must be equal or greater than 0");
 
             CheckInitialize();
 
             var scripts = from entry in _index
-                          where entry.Key >= firstIndex
+                          where entry.Key > lastIndex
                           select new Migration()
                           {
                               Seq = entry.Key,
