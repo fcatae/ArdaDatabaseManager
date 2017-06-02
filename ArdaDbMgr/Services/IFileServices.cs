@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using ArdaDbMgr.Services.Models;
 
-namespace ArdaDbMgr.Interfaces
+namespace ArdaDbMgr.Services
 {
     public interface IFileServices
     {

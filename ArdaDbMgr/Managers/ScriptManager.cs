@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Text;
 using ArdaDbMgr.Services;
 using ArdaDbMgr.Services.Models;
-using ArdaDbMgr.Interfaces;
+using ArdaDbMgr.Models;
 
 namespace ArdaDbMgr.Managers
 {
@@ -38,8 +38,8 @@ namespace ArdaDbMgr.Managers
                 Init();
             }
         }
-
-        public IEnumerable<SqlScript> GetPendingScripts(int firstIndex=1)
+        
+        public IEnumerable<Migration> GetPendingChanges(int firstIndex = 1)
         {
             if (firstIndex <= 0)
                 throw new ArgumentOutOfRangeException("firstIndex must be equal or greater than 1");
@@ -48,21 +48,7 @@ namespace ArdaDbMgr.Managers
 
             var scripts = from entry in _index
                           where entry.Key >= firstIndex
-                          select entry.Value;
-
-            return scripts;
-        }
-
-        public IEnumerable<SchemaModification> GetPendingChanges(int firstIndex = 1)
-        {
-            if (firstIndex <= 0)
-                throw new ArgumentOutOfRangeException("firstIndex must be equal or greater than 1");
-
-            CheckInitialize();
-
-            var scripts = from entry in _index
-                          where entry.Key >= firstIndex
-                          select new SchemaModification()
+                          select new Migration()
                           {
                               Seq = entry.Key,
                               Name = entry.Value.Name,
