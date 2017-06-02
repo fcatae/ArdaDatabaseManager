@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Linq;
+using ArdaDbMgr.Managers;
 using ArdaDbMgr.Services;
 
 namespace ArdaDbMgr
@@ -24,6 +25,12 @@ namespace ArdaDbMgr
             // Check schema history table
             // Get the latest update
             // Get the pending schema modifications
+
+            var fileSvcs = new FileServices("sqlfiles");
+            var scriptMgr = new ScriptManager(fileSvcs);
+
+            var list = scriptMgr.GetPendingChanges(2).ToArray();
+
         }
         
     }

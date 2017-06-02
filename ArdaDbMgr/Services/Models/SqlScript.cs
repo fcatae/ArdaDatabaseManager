@@ -19,6 +19,8 @@ namespace ArdaDbMgr.Services.Models
             _content = content;
         }
 
+        public string Name { get { return _name; } }
+
         public virtual string Read()
         {
             return _content;

@@ -10,6 +10,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Update="sqlfiles\002-create.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Update="sqlfiles\001-initial.sql">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

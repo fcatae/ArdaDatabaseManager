@@ -1,0 +1,1 @@
+﻿create table tb02(id int)
