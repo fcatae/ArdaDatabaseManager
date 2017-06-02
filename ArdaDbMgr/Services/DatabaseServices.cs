@@ -6,10 +6,11 @@ using System.Data;
 using System.Data.SqlClient;
 using System.Data.Common;
 using ArdaDbMgr.Services.Models;
+using ArdaDbMgr.Models;
 
 namespace ArdaDbMgr.Services
 {
-    public class DatabaseServices
+    public class DatabaseServices : IDatabaseServices
     {
         const string TABLE_SCHEMA_HISTORY = "[_SchemaHistory_]";
 
@@ -107,6 +108,11 @@ namespace ArdaDbMgr.Services
             Execute(insertSchemaHistory);
         }
 
+        public SchemaModification GetLatestSchemaModification()
+        {
+            return GetSchemaHistory(1).FirstOrDefault();
+        }
+
         public IEnumerable<SchemaModification> GetSchemaHistory(int rowcount = 1)
         {
             const string _SchemaHistory_ = TABLE_SCHEMA_HISTORY;
@@ -149,6 +155,13 @@ namespace ArdaDbMgr.Services
                     throw new InvalidOperationException("DatabaseServices: name contains space");
         }
         
+        public void ExecuteCommand(string commandText)
+        {
+            var command = DatabaseCommand.Text(commandText);
+
+            Execute(command);
+        }
+
         void Execute(DatabaseCommand command)
         {
             Execute<object>(command);
@@ -226,6 +239,44 @@ namespace ArdaDbMgr.Services
             {
                 return _command;
             }
+        }
+    }
+
+    public class VirtualDatabaseServices : IDatabaseServices
+    {
+        List<SchemaModification> _schemaMods;
+
+        public VirtualDatabaseServices()
+        {
+            _schemaMods = new List<SchemaModification>();
+        }
+
+        public VirtualDatabaseServices(IEnumerable<SchemaModification> schemaModList)
+        {
+            _schemaMods = new List<SchemaModification>(schemaModList);
+        }
+
+        public void ExecuteCommand(string commandText)
+        {
+        }
+
+        public void AddSchemaModification(string title, int hash)
+        {
+            _schemaMods.Add(new SchemaModification()
+            {
+                Name = title,
+                Hash = hash
+            });
+        }
+
+        public SchemaModification GetLatestSchemaModification()
+        {
+            int lastIndex = _schemaMods.Count - 1;
+
+            if (lastIndex < 0)
+                return null;
+
+            return _schemaMods[lastIndex];
         }
     }
 }

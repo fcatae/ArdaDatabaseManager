@@ -9,54 +9,29 @@ namespace ArdaDbMgr.Managers
 {
     public class SchemaManager
     {
-        private readonly DatabaseServices _databaseSvcs;
+        private readonly IDatabaseServices _databaseSvcs;
 
-        public SchemaManager(DatabaseServices databaseSvcs)
+        public SchemaManager(IDatabaseServices databaseSvcs)
         {
             _databaseSvcs = databaseSvcs;
         }
-
-        public Migration GetLastChange()
+        
+        public Migration GetLastestVersion()
         {
             // current database exists?
 
             // return null;???
 
             //
-            var lastSchemaChange = _databaseSvcs.GetSchemaHistory().FirstOrDefault();
+            var lastSchemaChange = _databaseSvcs.GetLatestSchemaModification();
 
             return (lastSchemaChange != null) ? new Migration(lastSchemaChange) : Migration.Zero;
         }
-
-        public void Apply(Migration migration)
-        {
-
-        }
-
-        // new interface
-        public Migration GetLatestVersion()
-        {
-            throw new InvalidOperationException();
-        }
+        
 
         public void UpgradeVersion(Migration migration)
         {
             throw new InvalidOperationException();
-        }
-
-        void BeginTransaction()
-        {
-            throw new InvalidOperationException();
-        }
-
-        void ModifySchema(Migration migration)
-        {
-            throw new InvalidOperationException();
-        }
-
-        void CommitTransaction()
-        {
-            throw new InvalidOperationException();
-        }
+        }      
     }
 }

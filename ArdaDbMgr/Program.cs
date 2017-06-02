@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.Linq;
 using ArdaDbMgr.Managers;
 using ArdaDbMgr.Services;
+using ArdaDbMgr.Services.Models;
 
 namespace ArdaDbMgr
 {
@@ -25,24 +26,11 @@ namespace ArdaDbMgr
             // Check schema history table
             // Get the latest update
             // Get the pending schema modifications
-
-            var dbsvcsInit = new DatabaseServices("Integrated Security=SSPI");
-            if (!dbsvcsInit.VerifyDatabase("DB003Managers"))
-            {
-                dbsvcsInit.CreateDatabase("DB003Managers");
-            }
-            var dbsvcs = new DatabaseServices("Integrated Security=SSPI;Database=DB003Managers");
-
-            if (dbsvcs.CheckSchemaHistoryExists())
-                dbsvcs.DropSchemaHistory();
-
-            dbsvcs.CreateSchemaHistory();
             
-            dbsvcs.AddSchemaModification("Initial", 10);
-            dbsvcs.AddSchemaModification("Second", 20);
-
-            var dbmgr = new SchemaManager(dbsvcs);
-            var lastmigration = dbmgr.GetLastChange();
+            var dbsvcs = new VirtualDatabaseServices(new SchemaModification[] {
+                new SchemaModification { Seq = 1, Name = "001-initial.sql", Hash = 0},
+                new SchemaModification { Seq = 2, Name = "002-second.sql", Hash = 0}
+                });
 
             var vfileSvcs = new VirtualFileServices(
                 new string[] {
@@ -53,7 +41,10 @@ namespace ArdaDbMgr
                     "002-second.sql"
                 });
 
+            var dbmgr = new SchemaManager(dbsvcs);
             var scriptMgr = new ScriptManager(vfileSvcs);
+
+            var lastmigration = dbmgr.GetLastestVersion();
 
             var list = scriptMgr.GetPendingChanges(lastmigration).ToArray();
 
