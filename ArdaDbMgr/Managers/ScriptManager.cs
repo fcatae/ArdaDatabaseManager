@@ -12,23 +12,52 @@ namespace ArdaDbMgr.Managers
     {
         private readonly IFileServices _fileSvcs;
         private bool _isInitialized = false;
-        private SortedDictionary<int, SqlScript> _index;
+        private SortedDictionary<int, SqlScript> _index = new SortedDictionary<int, SqlScript>();
+        private List<SqlScript> _otherScripts = new List<SqlScript>();
+        private int _maxIndex = -1;
+
+        public int MaxIndex
+            {
+            get { return _maxIndex;  }}
 
         public ScriptManager(IFileServices fileSvcs)
         {
             _fileSvcs = fileSvcs;
         }
 
-        void Init()
+        public void Init()
         {
             // enumerate all the scripts
             var scripts = _fileSvcs.EnumerateFiles();
 
-            // create the index
-            var index = CreateIndex(scripts);
+            foreach(var script in scripts)
+            {
+                int idx = GetIndex(script.Name);
 
+                SetMaxIndex(idx);
+                RegisterScript(idx, script);
+            }
+            
             _isInitialized = true;
-            _index = index;
+        }
+
+        void SetMaxIndex(int index)
+        {
+            if (index > _maxIndex)
+                _maxIndex = index;
+        }
+
+        void RegisterScript(int index, SqlScript script)
+        {
+            if (index > 0)
+            {
+                // valid script
+                _index.Add(index, script);
+            }
+            else
+            {
+                _otherScripts.Add(script);
+            }
         }
 
         void CheckInitialize()
@@ -38,34 +67,13 @@ namespace ArdaDbMgr.Managers
                 Init();
             }
         }
-
-        public string ReadText(Migration migration)
+        
+        public string ReadScript(int index)
         {
-            return _index[migration.Seq].Read();
-        }
+            if (!_index.ContainsKey(index))
+                return null;
 
-        public IEnumerable<Migration> GetPendingChanges(Migration migration)
-        {
-            return GetPendingChanges(migration.Seq);
-        }
-
-        public IEnumerable<Migration> GetPendingChanges(int lastIndex = 0)
-        {
-            if (lastIndex < 0)
-                throw new ArgumentOutOfRangeException("firstIndex must be equal or greater than 0");
-
-            CheckInitialize();
-
-            var scripts = from entry in _index
-                          where entry.Key > lastIndex
-                          select new Migration()
-                          {
-                              Seq = entry.Key,
-                              Name = entry.Value.Name,
-                              Hash = 0
-                          };
-
-            return scripts;
+            return _index[index].Read();
         }
 
         int GetIndex(string name)
@@ -81,29 +89,6 @@ namespace ArdaDbMgr.Managers
 
             return index;
         }
-
-        SortedDictionary<int,SqlScript> CreateIndex(IEnumerable<SqlScript> scripts)
-        {
-            var index = new SortedDictionary<int, SqlScript>();
-            List<SqlScript> invalidFiles = new List<SqlScript>();
-
-            foreach(var script in scripts)
-            {
-                string name = script.Name;
-                int idx = GetIndex(name);
-
-                if(idx > 0)
-                {
-                    index.Add(idx, script);
-                }
-
-                if(idx == 0 || idx < 0)
-                {
-                    invalidFiles.Add(script);
-                }
-            }
-
-            return index;
-        }
+        
     }
 }

@@ -44,15 +44,18 @@ namespace ArdaDbMgr
             var dbmgr = new SchemaManager(dbsvcs);
             var scriptMgr = new ScriptManager(vfileSvcs);
 
-            var lastmigration = dbmgr.GetLastestVersion();
+            scriptMgr.Init();
 
-            var list = scriptMgr.GetPendingChanges(lastmigration).ToArray();
+            int lastVersion = dbmgr.GetLastestVersion().Seq;
+            int finalVersion = scriptMgr.MaxIndex;
 
-            foreach(var s in list)
+            for(int version=lastVersion+1; version<finalVersion; version++)
             {
-                string val = scriptMgr.ReadText(s);
-            }
+                string text = scriptMgr.ReadScript(version);
 
+                if (text == null)
+                    throw new InvalidOperationException("skipped index");
+            }
         }
         
     }
