@@ -11,8 +11,8 @@ namespace ArdaDbMgrTest
         [Fact]
         public void FileEnumeration()
         {
-            var fileSvcs = new FileServices();
-            var fileList = fileSvcs.EnumerateFiles("sqlfiles").ToArray();
+            var fileSvcs = new FileServices("sqlfiles");
+            var fileList = fileSvcs.EnumerateFiles().ToArray();
 
             int numberFilesFound = fileList.Count();
 
