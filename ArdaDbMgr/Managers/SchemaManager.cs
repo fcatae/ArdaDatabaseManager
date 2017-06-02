@@ -32,5 +32,31 @@ namespace ArdaDbMgr.Managers
         {
 
         }
+
+        // new interface
+        public Migration GetLatestVersion()
+        {
+            throw new InvalidOperationException();
+        }
+
+        public void UpgradeVersion(Migration migration)
+        {
+            throw new InvalidOperationException();
+        }
+
+        void BeginTransaction()
+        {
+            throw new InvalidOperationException();
+        }
+
+        void ModifySchema(Migration migration)
+        {
+            throw new InvalidOperationException();
+        }
+
+        void CommitTransaction()
+        {
+            throw new InvalidOperationException();
+        }
     }
 }
