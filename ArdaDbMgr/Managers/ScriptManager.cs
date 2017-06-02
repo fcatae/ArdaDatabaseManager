@@ -4,16 +4,17 @@ using System.Collections.Generic;
 using System.Text;
 using ArdaDbMgr.Services;
 using ArdaDbMgr.Services.Models;
+using ArdaDbMgr.Interfaces;
 
 namespace ArdaDbMgr.Managers
 {
     public class ScriptManager
     {
-        private readonly FileServices _fileSvcs;
+        private readonly IFileServices _fileSvcs;
         private bool _isInitialized = false;
         private SortedDictionary<int, SqlScript> _index;
 
-        public ScriptManager(FileServices fileSvcs)
+        public ScriptManager(IFileServices fileSvcs)
         {
             _fileSvcs = fileSvcs;
         }

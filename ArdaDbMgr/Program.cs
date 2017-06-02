@@ -25,9 +25,17 @@ namespace ArdaDbMgr
             // Check schema history table
             // Get the latest update
             // Get the pending schema modifications
+            
+            var vfileSvcs = new VirtualFileServices(
+                new string[] {
+                    "001-initial.sql",
+                    "003-middle.sql",
+                    "listing.sql",
+                    "004-final.sql",
+                    "002-second.sql"
+                });
 
-            var fileSvcs = new FileServices("sqlfiles");
-            var scriptMgr = new ScriptManager(fileSvcs);
+            var scriptMgr = new ScriptManager(vfileSvcs);
 
             var list = scriptMgr.GetPendingChanges(2).ToArray();
 
