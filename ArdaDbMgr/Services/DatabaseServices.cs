@@ -56,6 +56,16 @@ namespace ArdaDbMgr.Services
             return (dbid > 0);
         }
 
+        public string GetDatabaseName()
+        {
+            var getDatabaseName = DatabaseCommand.Text
+                ($"SELECT DB_NAME()");                
+
+            var dbname = Execute<string>(getDatabaseName);
+
+            return dbname;
+        }
+
         public void CreateSchemaHistory()
         {
             const string _SchemaHistory_ = TABLE_SCHEMA_HISTORY;

@@ -7,6 +7,7 @@ namespace ArdaDbMgr.Services
 {
     public interface IDatabaseServices
     {
+        string GetDatabaseName();
         SchemaChange GetLatestSchemaModification();
         void AddSchemaModification(int seq, string title, int hash);
         SchemaChange GetSchemaModification(int seq);

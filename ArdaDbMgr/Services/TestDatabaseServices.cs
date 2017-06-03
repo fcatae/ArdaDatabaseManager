@@ -24,6 +24,11 @@ namespace ArdaDbMgr.Services
             _schemaMods = new List<SchemaChange>(schemaModList);
         }
 
+        public string GetDatabaseName()
+        {
+            return "TestDatabaseServices";
+        }
+
         public void ExecuteCommand(string commandText)
         {
         }

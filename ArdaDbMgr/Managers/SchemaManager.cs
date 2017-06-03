@@ -22,6 +22,15 @@ namespace ArdaDbMgr.Managers
         
         public void Init()
         {
+            string dbname = _databaseSvcs.GetDatabaseName();
+
+            // check it is not master db
+            if (dbname == "master")
+                throw new InvalidOperationException("dbname == master");
+
+            // check table history exists
+
+
             //throw new InvalidOperationException();
         }
 
