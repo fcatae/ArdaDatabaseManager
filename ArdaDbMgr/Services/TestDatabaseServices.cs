@@ -29,6 +29,16 @@ namespace ArdaDbMgr.Services
             return "TestDatabaseServices";
         }
 
+        public bool CheckSchemaHistoryExists()
+        {
+            return (_schemaMods != null);
+        }
+
+        public void CreateSchemaHistory()
+        {
+            _schemaMods = new List<SchemaChange>();
+        }
+
         public void ExecuteCommand(string commandText)
         {
         }

@@ -29,9 +29,10 @@ namespace ArdaDbMgr.Managers
                 throw new InvalidOperationException("dbname == master");
 
             // check table history exists
-
-
-            //throw new InvalidOperationException();
+            if (!_databaseSvcs.CheckSchemaHistoryExists())
+            {
+                _databaseSvcs.CreateSchemaHistory();
+            }
         }
 
         public int GetLastestVersion()
