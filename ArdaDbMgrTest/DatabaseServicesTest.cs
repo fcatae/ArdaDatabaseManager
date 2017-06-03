@@ -54,10 +54,14 @@ namespace ArdaDbMgrTest
             dbsvcs.CreateSchemaHistory();
             bool afterSchemaHistory = dbsvcs.CheckSchemaHistoryExists();
 
+            Assert.ThrowsAny<Exception>(() => {
+                dbsvcs.AddSchemaModification(0, "Invalid: must fail", 0);
+            });
+
             // add & get
-            dbsvcs.AddSchemaModification("Initial", 10);
-            dbsvcs.AddSchemaModification("Second", 20);
-            dbsvcs.AddSchemaModification("Third", 30);
+            dbsvcs.AddSchemaModification(1, "Initial", 10);
+            dbsvcs.AddSchemaModification(2, "Second", 20);
+            dbsvcs.AddSchemaModification(3, "Third", 30);
 
             var modifications = dbsvcs.GetSchemaHistory(5).ToArray();
             Assert.Equal("Third", modifications[0].Name );
