@@ -13,12 +13,12 @@ namespace ArdaDbMgrTest
         [Fact]
         public void ApplyMigrations()
         {
-            var dbsvcs = new VirtualDatabaseServices(new SchemaChange[] {
+            var dbsvcs = new TestDatabaseServices(new SchemaChange[] {
                 new SchemaChange { Seq = 1, Name = "001-initial.sql", Hash = 0},
                 new SchemaChange { Seq = 2, Name = "002-second.sql", Hash = 0}
                 });
 
-            var vfileSvcs = new VirtualFileServices(
+            var vfileSvcs = new TestFileServices(
                 new string[] {
                     "001-initial.sql",
                     "003-middle.sql",

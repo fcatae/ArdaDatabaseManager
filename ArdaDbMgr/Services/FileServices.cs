@@ -52,23 +52,5 @@ namespace ArdaDbMgr.Services
                 return File.ReadAllText(_path);
             }
         }
-    }
-
-    public class VirtualFileServices : IFileServices
-    {
-        SqlScript[] _scriptList; 
-
-        public VirtualFileServices(IEnumerable<string> filenames)
-        {
-            var sqlscripts = from filename in filenames
-                             select new SqlScript(filename, "-- content file = " + filename);
-
-            _scriptList = sqlscripts.ToArray();
-        }
-
-        public IEnumerable<SqlScript> EnumerateFiles()
-        {
-            return _scriptList.ToArray();
-        }
-    }
+    }    
 }
