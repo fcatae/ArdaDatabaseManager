@@ -24,6 +24,7 @@ namespace ArdaDbMgr.Models
 
         public override void Apply(IDatabaseServices databaseService)
         {
+            // no transaction -- if the commands fail in the middle
             databaseService.ExecuteCommand(SqlTextCommand);
             databaseService.AddSchemaModification(this.Seq, this.Name, this.Hash);
         }

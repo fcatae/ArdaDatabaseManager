@@ -29,8 +29,9 @@ namespace ArdaDbMgr
                 });
 
             var dbsvcs = new DatabaseServices("Integrated Security=SSPI;Database=DB01");
+            var filesvcs = new FileServices("sqlfiles");
 
-            var dbschmgr = new DatabaseSchemaManager(dbsvcs, test_fileSvcs);
+            var dbschmgr = new DatabaseSchemaManager(dbsvcs, filesvcs);
 
             dbschmgr.Init();
             dbschmgr.Upgrade();

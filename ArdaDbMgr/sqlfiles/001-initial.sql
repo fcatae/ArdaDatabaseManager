@@ -1,1 +1,1 @@
-﻿create table tb01(id int)
+﻿create table table01(id int)
