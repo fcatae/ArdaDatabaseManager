@@ -31,6 +31,8 @@ namespace ArdaDbMgr.Managers
 
             var lastSchemaChange = _databaseSvcs.GetLatestSchemaModification();
 
+            // return 0 if history table is empty
+
             return (lastSchemaChange == null) ? 0 : lastSchemaChange.Seq;
         }
 

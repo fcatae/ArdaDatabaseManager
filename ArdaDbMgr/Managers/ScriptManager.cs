@@ -19,7 +19,9 @@ namespace ArdaDbMgr.Managers
         public int MaxVersion
         {
             get {
-                CheckInitialize();
+                if (_maxIndex <= 0)
+                    throw new InvalidOperationException("_maxIndex <= 0");
+
                 return _maxIndex;
             }
         }
@@ -55,17 +57,7 @@ namespace ArdaDbMgr.Managers
             
             _isInitialized = true;
         }
-
-        public string ReadScript(int index)
-        {
-            CheckInitialize();
-
-            if (!_index.ContainsKey(index))
-                return null;
-
-            return _index[index].Read();
-        }
-
+        
         public Migration GetScriptMigration(int index)
         {
             CheckInitialize();
@@ -87,9 +79,7 @@ namespace ArdaDbMgr.Managers
         void CheckInitialize()
         {
             if (!_isInitialized)
-            {
-                Init();
-            }
+                throw new InvalidOperationException("!_isInitialized");
         }
 
         int GetIndex(string name)

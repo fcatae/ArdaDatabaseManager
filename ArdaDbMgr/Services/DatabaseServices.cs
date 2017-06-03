@@ -134,6 +134,7 @@ namespace ArdaDbMgr.Services
 
         public SchemaChange GetLatestSchemaModification()
         {
+            // may return null
             return GetSchemaHistory(1).FirstOrDefault();
         }
 

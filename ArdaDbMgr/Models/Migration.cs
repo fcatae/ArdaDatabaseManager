@@ -8,8 +8,6 @@ namespace ArdaDbMgr.Models
 {
     public class Migration
     {
-        public static Migration Zero = new Migration() { Seq = 0, Name = "--[Migration.Zero]--", Hash = 0 };
-
         public int Seq;
         public string Name;
         public int Hash;
