@@ -12,16 +12,8 @@ namespace ArdaDbMgr
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("Hello World!");
+            Console.WriteLine("Hello DatabaseSchemaManager!");
             
-            // Enumerate files
-            // Connect to database
-            // Check database is created
-            // Create database if needed
-            // Check schema history table
-            // Get the latest update
-            // Get the pending schema modifications
-
             var dbsvcs = new VirtualDatabaseServices(new SchemaChange[] {
                 new SchemaChange { Seq = 1, Name = "001-initial.sql", Hash = 0},
                 new SchemaChange { Seq = 2, Name = "002-second.sql", Hash = 0}
