@@ -5,6 +5,8 @@ using System.Text;
 using ArdaDbMgr.Services;
 using ArdaDbMgr.Services.Models;
 using ArdaDbMgr.Models;
+using System.Text.RegularExpressions;
+using System.Security.Cryptography;
 
 namespace ArdaDbMgr.Managers
 {
@@ -15,6 +17,8 @@ namespace ArdaDbMgr.Managers
         private SortedDictionary<int, SqlScript> _index;
         private List<SqlScript> _otherScripts;
         private int _maxIndex = -1;
+        private Regex _filePatternRegex;
+        private SHA1 _encryptorSha1 = SHA1.Create();
 
         public int MaxVersion
         {
@@ -30,6 +34,18 @@ namespace ArdaDbMgr.Managers
         {
             if (fileSvcs == null)
                 throw new ArgumentNullException(nameof(fileSvcs));
+
+            _filePatternRegex = new Regex(@"^(\d\d\d)-");
+
+            _fileSvcs = fileSvcs;
+        }
+
+        public ScriptManager(IFileServices fileSvcs, string filePattern)
+        {
+            if (fileSvcs == null)
+                throw new ArgumentNullException(nameof(fileSvcs));
+
+            _filePatternRegex = new Regex(filePattern);
 
             _fileSvcs = fileSvcs;
         }
@@ -66,13 +82,14 @@ namespace ArdaDbMgr.Managers
                 throw new ArgumentOutOfRangeException("!_index.ContainsKey(index)");
 
             SqlScript script = _index[index];
+            string text = script.Read();
 
             return new SqlMigration()
             {
                 Seq = index,
                 Name = script.Name,
-                Hash = 0,
-                SqlTextCommand = script.Read()
+                Hash = CalculateHash(text),
+                SqlTextCommand = text
             };
         }
 
@@ -84,14 +101,14 @@ namespace ArdaDbMgr.Managers
 
         int GetIndex(string name)
         {
-            if (name == null || name.Length <= 4)
-                return -1;
-
-            string prefix = name.Substring(0, 3);
-
             int index = -1;
+            var match = _filePatternRegex.Match(name);
 
-            Int32.TryParse(prefix, out index);
+            if (match != null && match.Groups.Count > 1)
+            {
+                string number = match.Groups[1].Value;
+                Int32.TryParse(number, out index);
+            }
 
             return index;
         }
@@ -109,5 +126,14 @@ namespace ArdaDbMgr.Managers
             _otherScripts.Add(script);
         }
  
+        int CalculateHash(string text)
+        {            
+            byte[] buf = System.Text.Encoding.UTF8.GetBytes(text);
+            byte[] hash = _encryptorSha1.ComputeHash(buf, 0, buf.Length);
+            int ret = System.BitConverter.ToInt32(hash, 0);
+
+            return ret;
+        }
+
     }
 }

@@ -19,7 +19,7 @@ namespace ArdaDbMgr
                 new SchemaChange { Seq = 2, Name = "002-second.sql", Hash = 0}
                 });
 
-            var test_fileSvcs = new TestFileServices(
+            var test_filesvcs = new TestFileServices(
                 new string[] {
                     "001-initial.sql",
                     "003-middle.sql",
@@ -31,7 +31,7 @@ namespace ArdaDbMgr
             var dbsvcs = new DatabaseServices("Integrated Security=SSPI;Database=DB01");
             var filesvcs = new FileServices("sqlfiles");
 
-            var dbschmgr = new DatabaseSchemaManager(dbsvcs, filesvcs);
+            var dbschmgr = new DatabaseSchemaManager(test_dbsvcs, test_filesvcs);
 
             dbschmgr.Init();
             dbschmgr.Upgrade();
