@@ -16,7 +16,7 @@ namespace ArdaDbMgr.Managers
         private List<SqlScript> _otherScripts;
         private int _maxIndex = -1;
 
-        public int MaxIndex
+        public int MaxVersion
         {
             get {
                 CheckInitialize();
@@ -61,6 +61,24 @@ namespace ArdaDbMgr.Managers
                 return null;
 
             return _index[index].Read();
+        }
+
+        public Migration GetScriptMigration(int index)
+        {
+            CheckInitialize();
+
+            if (!_index.ContainsKey(index))
+                throw new ArgumentOutOfRangeException("!_index.ContainsKey(index)");
+
+            SqlScript script = _index[index];
+
+            return new SqlMigration()
+            {
+                Seq = index,
+                Name = script.Name,
+                Hash = 0,
+                SqlTextCommand = script.Read()
+            };
         }
 
         int GetIndex(string name)

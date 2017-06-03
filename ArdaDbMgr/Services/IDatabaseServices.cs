@@ -7,8 +7,8 @@ namespace ArdaDbMgr.Services
 {
     public interface IDatabaseServices
     {
-        SchemaModification GetLatestSchemaModification();
-
+        SchemaChange GetLatestSchemaModification();
+        void AddSchemaModification(int seq, string title, int hash);
         void ExecuteCommand(string commandText);
     }
 }

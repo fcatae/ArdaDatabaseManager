@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.Linq;
 using ArdaDbMgr.Managers;
+using ArdaDbMgr.Models;
 using ArdaDbMgr.Services;
 using ArdaDbMgr.Services.Models;
 
@@ -17,8 +18,6 @@ namespace ArdaDbMgr
 
             dbschmgr.Connect("connectionString");
 
-            dbschmgr.StartUpgrade();
-
             // Enumerate files
             // Connect to database
             // Check database is created
@@ -27,9 +26,9 @@ namespace ArdaDbMgr
             // Get the latest update
             // Get the pending schema modifications
             
-            var dbsvcs = new VirtualDatabaseServices(new SchemaModification[] {
-                new SchemaModification { Seq = 1, Name = "001-initial.sql", Hash = 0},
-                new SchemaModification { Seq = 2, Name = "002-second.sql", Hash = 0}
+            var dbsvcs = new VirtualDatabaseServices(new SchemaChange[] {
+                new SchemaChange { Seq = 1, Name = "001-initial.sql", Hash = 0},
+                new SchemaChange { Seq = 2, Name = "002-second.sql", Hash = 0}
                 });
 
             var vfileSvcs = new VirtualFileServices(
@@ -41,20 +40,22 @@ namespace ArdaDbMgr
                     "002-second.sql"
                 });
 
-            var dbmgr = new SchemaManager(dbsvcs);
+            var schemaMgr = new SchemaManager(dbsvcs);
             var scriptMgr = new ScriptManager(vfileSvcs);
 
+            schemaMgr.Init();
             scriptMgr.Init();
 
-            int lastVersion = dbmgr.GetLastestVersion().Seq;
-            int finalVersion = scriptMgr.MaxIndex;
+            int version = schemaMgr.GetLastestVersion() + 1;
+            int finalVersion = scriptMgr.MaxVersion;
 
-            for(int version=lastVersion+1; version<finalVersion; version++)
+            while( version <= finalVersion )
             {
-                string text = scriptMgr.ReadScript(version);
+                var migration = scriptMgr.GetScriptMigration(version);
 
-                if (text == null)
-                    throw new InvalidOperationException("skipped index");
+                schemaMgr.ApplyMigration(migration);
+
+                version++;
             }
         }
         

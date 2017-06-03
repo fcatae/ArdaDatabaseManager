@@ -108,12 +108,28 @@ namespace ArdaDbMgr.Services
             Execute(insertSchemaHistory);
         }
 
-        public SchemaModification GetLatestSchemaModification()
+        public void AddSchemaModification(int seq, string title, int hash)
+        {
+            const string _SchemaHistory_ = TABLE_SCHEMA_HISTORY;
+
+            if (title == null)
+                throw new ArgumentNullException(nameof(title));
+
+            var insertSchemaHistory = DatabaseCommand.Text
+                ($"INSERT {_SchemaHistory_}(Seq,Name, Hash) VALUES (@seq,@title, @hash)")
+                .Parameter("@seq", seq)
+                .Parameter("@title", title)
+                .Parameter("@hash", hash);
+
+            Execute(insertSchemaHistory);
+        }
+
+        public SchemaChange GetLatestSchemaModification()
         {
             return GetSchemaHistory(1).FirstOrDefault();
         }
 
-        public IEnumerable<SchemaModification> GetSchemaHistory(int rowcount = 1)
+        public IEnumerable<SchemaChange> GetSchemaHistory(int rowcount = 1)
         {
             const string _SchemaHistory_ = TABLE_SCHEMA_HISTORY;
 
@@ -126,7 +142,7 @@ namespace ArdaDbMgr.Services
 
             var results = Execute(getSchemaHistory, 
                 r => 
-                new SchemaModification {
+                new SchemaChange {
                     Seq = (int)r["Seq"],
                     Name = (string)r["Name"],
                     Hash = (int)r["Hash"]
@@ -244,16 +260,16 @@ namespace ArdaDbMgr.Services
 
     public class VirtualDatabaseServices : IDatabaseServices
     {
-        List<SchemaModification> _schemaMods;
+        List<SchemaChange> _schemaMods;
 
         public VirtualDatabaseServices()
         {
-            _schemaMods = new List<SchemaModification>();
+            _schemaMods = new List<SchemaChange>();
         }
 
-        public VirtualDatabaseServices(IEnumerable<SchemaModification> schemaModList)
+        public VirtualDatabaseServices(IEnumerable<SchemaChange> schemaModList)
         {
-            _schemaMods = new List<SchemaModification>(schemaModList);
+            _schemaMods = new List<SchemaChange>(schemaModList);
         }
 
         public void ExecuteCommand(string commandText)
@@ -262,14 +278,24 @@ namespace ArdaDbMgr.Services
 
         public void AddSchemaModification(string title, int hash)
         {
-            _schemaMods.Add(new SchemaModification()
+            _schemaMods.Add(new SchemaChange()
             {
                 Name = title,
                 Hash = hash
             });
         }
 
-        public SchemaModification GetLatestSchemaModification()
+        public void AddSchemaModification(int seq, string title, int hash)
+        {
+            _schemaMods.Add(new SchemaChange()
+            {
+                Seq = seq,
+                Name = title,
+                Hash = hash
+            });
+        }
+
+        public SchemaChange GetLatestSchemaModification()
         {
             int lastIndex = _schemaMods.Count - 1;
 

@@ -4,7 +4,7 @@ using System.Text;
 
 namespace ArdaDbMgr.Services.Models
 {
-    public class SchemaModification
+    public class SchemaChange
     {
         public int Seq;
         public string Name;

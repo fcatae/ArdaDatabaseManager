@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using ArdaDbMgr.Models;
 using ArdaDbMgr.Services;
+using ArdaDbMgr.Services.Models;
 
 namespace ArdaDbMgr.Managers
 {
@@ -13,25 +14,55 @@ namespace ArdaDbMgr.Managers
 
         public SchemaManager(IDatabaseServices databaseSvcs)
         {
+            if (databaseSvcs == null)
+                throw new ArgumentNullException(nameof(databaseSvcs));
+
             _databaseSvcs = databaseSvcs;
         }
         
-        public Migration GetLastestVersion()
+        public void Init()
         {
-            // current database exists?
+            //throw new InvalidOperationException();
+        }
 
-            // return null;???
+        public int GetLastestVersion()
+        {
+            // table must exist at this point
 
-            //
             var lastSchemaChange = _databaseSvcs.GetLatestSchemaModification();
 
-            return (lastSchemaChange != null) ? new Migration(lastSchemaChange) : Migration.Zero;
+            return (lastSchemaChange == null) ? 0 : lastSchemaChange.Seq;
         }
         
+        //public Migration GetMigration(int index)
+        //{
+        //    var lastSchemaChange = _databaseSvcs.GetSchemaChange();
 
-        public void UpgradeVersion(Migration migration)
+        //    return CreateMigration(lastSchemaChange);
+        //}
+
+        //Migration CreateMigration(SchemaChange schema)
+        //{
+        //    if (schema == null)
+        //        return Migration.Zero;
+
+        //    if (schema.Seq <= 0)
+        //        throw new ArgumentOutOfRangeException("schema.Seq <= 0");
+
+        //    return new Migration()
+        //    {
+        //        Seq = schema.Seq,
+        //        Name = schema.Name,
+        //        Hash = schema.Hash
+        //    };
+        //}
+
+        public void ApplyMigration(Migration migration)
         {
-            throw new InvalidOperationException();
-        }      
+            if (migration == null)
+                throw new ArgumentNullException(nameof(migration));
+
+            migration.Apply(_databaseSvcs);
+        }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using ArdaDbMgr.Services;
 using ArdaDbMgr.Services.Models;
 
 namespace ArdaDbMgr.Models
@@ -12,16 +13,21 @@ namespace ArdaDbMgr.Models
         public int Seq;
         public string Name;
         public int Hash;
-
-        public Migration()
+        
+        public virtual void Apply(IDatabaseServices databaseService)
         {
+            databaseService.AddSchemaModification(this.Seq, this.Name, this.Hash);
         }
+    }
 
-        public Migration(SchemaModification schema)
+    public class SqlMigration : Migration
+    {
+        public string SqlTextCommand;
+
+        public override void Apply(IDatabaseServices databaseService)
         {
-            this.Seq = schema.Seq;
-            this.Name = schema.Name;
-            this.Hash = schema.Hash;
+            databaseService.ExecuteCommand(SqlTextCommand);
+            databaseService.AddSchemaModification(this.Seq, this.Name, this.Hash);
         }
     }
 }
