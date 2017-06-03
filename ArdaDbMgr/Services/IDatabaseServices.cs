@@ -9,6 +9,7 @@ namespace ArdaDbMgr.Services
     {
         SchemaChange GetLatestSchemaModification();
         void AddSchemaModification(int seq, string title, int hash);
+        SchemaChange GetSchemaModification(int seq);
         void ExecuteCommand(string commandText);
     }
 }

@@ -124,6 +124,29 @@ namespace ArdaDbMgr.Services
             Execute(insertSchemaHistory);
         }
 
+        public SchemaChange GetSchemaModification(int seq)
+        {
+            const string _SchemaHistory_ = TABLE_SCHEMA_HISTORY;
+
+            if (seq <= 0)
+                throw new ArgumentOutOfRangeException(nameof(seq));
+
+            var getSchemaHistory = DatabaseCommand.Text
+                ($"SELECT Seq, Name, Hash FROM {_SchemaHistory_} WHERE Seq=@seq")
+                .Parameter("@seq", seq);
+
+            var results = Execute(getSchemaHistory,
+                r =>
+                new SchemaChange
+                {
+                    Seq = (int)r["Seq"],
+                    Name = (string)r["Name"],
+                    Hash = (int)r["Hash"]
+                });
+
+            return results.Single();
+        }
+
         public SchemaChange GetLatestSchemaModification()
         {
             return GetSchemaHistory(1).FirstOrDefault();
@@ -297,12 +320,22 @@ namespace ArdaDbMgr.Services
 
         public SchemaChange GetLatestSchemaModification()
         {
-            int lastIndex = _schemaMods.Count - 1;
+            int last = _schemaMods.Count - 1;
 
-            if (lastIndex < 0)
+            if (last < 0)
                 return null;
 
-            return _schemaMods[lastIndex];
+            return _schemaMods[last];
+        }
+
+        public SchemaChange GetSchemaModification(int seq)
+        {
+            var schema = _schemaMods.Find( s => s.Seq == seq );
+
+            if (schema == null)
+                throw new InvalidOperationException("_schemaMods.Find( s => s.Seq == seq ) returned null");
+
+            return schema;
         }
     }
 }

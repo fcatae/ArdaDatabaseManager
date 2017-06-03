@@ -9,7 +9,15 @@ namespace ArdaDbMgr
     class DatabaseSchemaManager
     {
         IDatabaseServices _dbsvcs;
-        IFileServices _vfileSvcs;
+        IFileServices _fileSvcs;
+        SchemaManager _schemaMgr;
+        ScriptManager _scriptMgr;
+
+        public DatabaseSchemaManager(IDatabaseServices dbsvcs, IFileServices fileSvcs)
+        {
+            _dbsvcs = dbsvcs;
+            _fileSvcs = fileSvcs;
+        }
 
         public DatabaseSchemaManager(string folder)
         {
@@ -21,11 +29,11 @@ namespace ArdaDbMgr
 
         public void Init()
         {
-            var schemaMgr = new SchemaManager(_dbsvcs);
-            var scriptMgr = new ScriptManager(_vfileSvcs);
+            _schemaMgr = new SchemaManager(_dbsvcs);
+            _scriptMgr = new ScriptManager(_fileSvcs);
 
-            schemaMgr.Init();
-            scriptMgr.Init();
+            _schemaMgr.Init();
+            _scriptMgr.Init();
         }
 
         public void ValidateLocalFiles()
@@ -38,11 +46,8 @@ namespace ArdaDbMgr
 
         public void Upgrade()
         {
-            var schemaMgr = new SchemaManager(_dbsvcs);
-            var scriptMgr = new ScriptManager(_vfileSvcs);
-
-            schemaMgr.Init();
-            scriptMgr.Init();
+            var schemaMgr = _schemaMgr;
+            var scriptMgr = _scriptMgr;
 
             int version = schemaMgr.GetLastestVersion() + 1;
             int finalVersion = scriptMgr.MaxVersion;
@@ -55,6 +60,11 @@ namespace ArdaDbMgr
 
                 version++;
             }
+        }
+
+        public int GetCurrentVersion()
+        {
+            return _schemaMgr.GetLastestVersion();
         }
     }
 }

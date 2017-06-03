@@ -33,29 +33,24 @@ namespace ArdaDbMgr.Managers
 
             return (lastSchemaChange == null) ? 0 : lastSchemaChange.Seq;
         }
-        
-        //public Migration GetMigration(int index)
-        //{
-        //    var lastSchemaChange = _databaseSvcs.GetSchemaChange();
 
-        //    return CreateMigration(lastSchemaChange);
-        //}
+        public Migration GetMigration(int index)
+        {
+            if (index <= 0)
+                throw new ArgumentOutOfRangeException("index <= 0");
 
-        //Migration CreateMigration(SchemaChange schema)
-        //{
-        //    if (schema == null)
-        //        return Migration.Zero;
+            var schema = _databaseSvcs.GetSchemaModification(index);
 
-        //    if (schema.Seq <= 0)
-        //        throw new ArgumentOutOfRangeException("schema.Seq <= 0");
+            if (schema == null)
+                throw new InvalidOperationException("schema == null");
 
-        //    return new Migration()
-        //    {
-        //        Seq = schema.Seq,
-        //        Name = schema.Name,
-        //        Hash = schema.Hash
-        //    };
-        //}
+            return new Migration()
+            {
+                Seq = schema.Seq,
+                Name = schema.Name,
+                Hash = schema.Hash
+            };
+        }
 
         public void ApplyMigration(Migration migration)
         {

@@ -26,6 +26,9 @@ namespace ArdaDbMgr.Managers
 
         public ScriptManager(IFileServices fileSvcs)
         {
+            if (fileSvcs == null)
+                throw new ArgumentNullException(nameof(fileSvcs));
+
             _fileSvcs = fileSvcs;
         }
 
@@ -81,6 +84,14 @@ namespace ArdaDbMgr.Managers
             };
         }
 
+        void CheckInitialize()
+        {
+            if (!_isInitialized)
+            {
+                Init();
+            }
+        }
+
         int GetIndex(string name)
         {
             if (name == null || name.Length <= 4)
@@ -107,13 +118,6 @@ namespace ArdaDbMgr.Managers
         {
             _otherScripts.Add(script);
         }
-
-        void CheckInitialize()
-        {
-            if(!_isInitialized)
-            {
-                Init();
-            }
-        }        
+ 
     }
 }

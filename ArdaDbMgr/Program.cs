@@ -13,11 +13,7 @@ namespace ArdaDbMgr
         static void Main(string[] args)
         {
             Console.WriteLine("Hello World!");
-
-            var dbschmgr = new DatabaseSchemaManager("sqlfiles");
-
-            dbschmgr.Connect("connectionString");
-
+            
             // Enumerate files
             // Connect to database
             // Check database is created
@@ -25,7 +21,7 @@ namespace ArdaDbMgr
             // Check schema history table
             // Get the latest update
             // Get the pending schema modifications
-            
+
             var dbsvcs = new VirtualDatabaseServices(new SchemaChange[] {
                 new SchemaChange { Seq = 1, Name = "001-initial.sql", Hash = 0},
                 new SchemaChange { Seq = 2, Name = "002-second.sql", Hash = 0}
@@ -40,23 +36,12 @@ namespace ArdaDbMgr
                     "002-second.sql"
                 });
 
-            var schemaMgr = new SchemaManager(dbsvcs);
-            var scriptMgr = new ScriptManager(vfileSvcs);
+            var dbschmgr = new DatabaseSchemaManager(dbsvcs, vfileSvcs);
 
-            schemaMgr.Init();
-            scriptMgr.Init();
+            dbschmgr.Init();
+            dbschmgr.Upgrade();
 
-            int version = schemaMgr.GetLastestVersion() + 1;
-            int finalVersion = scriptMgr.MaxVersion;
-
-            while( version <= finalVersion )
-            {
-                var migration = scriptMgr.GetScriptMigration(version);
-
-                schemaMgr.ApplyMigration(migration);
-
-                version++;
-            }
+            int version = dbschmgr.GetCurrentVersion();
         }
         
     }

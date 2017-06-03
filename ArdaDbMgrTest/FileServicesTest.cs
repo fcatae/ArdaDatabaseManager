@@ -16,7 +16,7 @@ namespace ArdaDbMgrTest
 
             int numberFilesFound = fileList.Count();
 
-            Assert.Equal(1, numberFilesFound);
+            Assert.Equal(2, numberFilesFound);
         }
     }
 }
