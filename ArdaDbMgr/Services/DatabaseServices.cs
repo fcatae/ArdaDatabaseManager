@@ -1,4 +1,6 @@
-﻿using System;
+﻿#define DISPOSE_CONNECTION
+
+using System;
 using System.Linq;
 using System.Collections.Generic;
 using System.Text;
@@ -10,11 +12,12 @@ using ArdaDbMgr.Models;
 
 namespace ArdaDbMgr.Services
 {
-    public class DatabaseServices : IDatabaseServices
+    public class DatabaseServices : IDatabaseServices, IDisposable
     {
         const string TABLE_SCHEMA_HISTORY = "[_SchemaHistory_]";
 
         private readonly string _connectionString;
+        private SqlConnection _currentConnection = null;
 
         public DatabaseServices(string connectionString)
         {
@@ -206,7 +209,9 @@ namespace ArdaDbMgr.Services
         {
             T result;
 
-            using (var connection = new SqlConnection(_connectionString))
+            var connection = GetConnection();
+
+            try
             {
                 SqlCommand cmd = command.GetSqlCommand();
 
@@ -218,6 +223,10 @@ namespace ArdaDbMgr.Services
 
                 result = (obj is DBNull) ? default(T) : (T)obj;
             }
+            finally
+            {
+                CloseConnection(connection);
+            }
 
             return result;
         }
@@ -226,7 +235,9 @@ namespace ArdaDbMgr.Services
         {
             List<T> resultSet = new List<T>();
 
-            using (var connection = new SqlConnection(_connectionString))
+            var connection = GetConnection();
+
+            try
             {
                 SqlCommand cmd = command.GetSqlCommand();
 
@@ -245,8 +256,42 @@ namespace ArdaDbMgr.Services
                     resultSet.Add(result);
                 }
             }
+            finally
+            {
+                CloseConnection(connection);
+            }
 
             return resultSet;
+        }
+
+        SqlConnection GetConnection()
+        {
+            if(_currentConnection == null)
+            {
+                _currentConnection = new SqlConnection(_connectionString);
+            }
+
+            return _currentConnection;            
+        }
+
+        void CloseConnection(SqlConnection connection)
+        {
+            if (connection != _currentConnection)
+                throw new InvalidOperationException("connection != _currentConnection");
+
+#if DISPOSE_CONNECTION
+            _currentConnection.Dispose();
+            _currentConnection = null;
+#endif         
+        }
+
+        public void Dispose()
+        {
+            if(_currentConnection != null)
+            {
+                _currentConnection.Dispose();
+                _currentConnection = null;
+            }
         }
 
         class DatabaseCommand

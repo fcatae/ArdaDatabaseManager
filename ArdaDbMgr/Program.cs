@@ -37,6 +37,8 @@ namespace ArdaDbMgr
             dbschmgr.Upgrade();
 
             int version = dbschmgr.GetCurrentVersion();
+
+            dbsvcs.Dispose();
         }
         
     }
