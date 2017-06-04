@@ -23,8 +23,37 @@ namespace ArdaDbMgr
         {
         }
 
-        public void Connect(string connectionString)
+        public DatabaseSchemaManager Folder(string folder, string pattern=null)
         {
+            // define the base folder with scripts
+            throw new InvalidOperationException();
+        }
+        
+        public DatabaseSchemaManager Connect(string connectionString, string scripthistory="_ScriptHistory_")
+        {
+            // define the target database
+            throw new InvalidOperationException();
+        }
+
+        // removed:
+        // - master responsibilities
+        // - database cloning
+        // - data seeding
+        // - final db script
+        // - bcp 
+
+        // create user?
+        // create schema?
+        // create new connection string?
+        // initial seed?
+
+        public void Run()
+        {
+            // test everything is fine
+            // no version conflicts
+            // data is ok
+            // undo/redo
+            // redo/redo
         }
 
         public void Init()
